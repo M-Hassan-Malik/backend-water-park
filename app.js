@@ -16,7 +16,14 @@ app.use((req, res, next) => {
     next()
 })
 require('dotenv').config();
+var cors = require("cors");
 
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
 const { User, Otp } = require('./databases/index');
 
 
