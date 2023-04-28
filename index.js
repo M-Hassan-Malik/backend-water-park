@@ -112,7 +112,7 @@ app.post('/forget-password', async (req, res) => {
 
         transporter.sendMail(options, async (err, result) => {
             if (err) {
-                return res.status(500).json({ data: `Something when wrong: ${err.message}`, code: err.code, status: 'failed' });
+                return res.status(500).json({ data: `Something when wrong: ${err.message}`, code: 500, status: 'failed' });
             } else {
 
                 const saveOtp = new Otp({
