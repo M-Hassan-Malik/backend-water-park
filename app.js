@@ -202,7 +202,7 @@ app.post('/reset-password', async (req, res) => {
     }
 })
 app.use((req, res) => {
-    res.send(404).json({ data: "404 not found", code: 404, status: 'Failed' })
+    res.status(404).json({ data: "404 not found", code: 404, status: 'Failed' })
 })
 // if(!process.env.NOTIFICATION_EMAIL || !process.env.NOTIFICATION_PASS || !process.env.PORT) {
 
