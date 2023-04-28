@@ -2,7 +2,6 @@ const express = require('express')
 const moment = require('moment-timezone');
 moment.tz.setDefault('Asia/Karachi');
 const app = express()
-const port = 4000;
 app.use(
     express.urlencoded({
         extended: true,
@@ -13,8 +12,10 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+
     next()
 })
+require('dotenv').config();
 
 const { User, Otp } = require('./databases/index');
 
@@ -87,15 +88,20 @@ app.post('/forget-password', async (req, res) => {
         const transporter = nodemailer.createTransport({
             service: "outlook",
             auth: {
-                user: "auth_duty@outlook.com",
-                pass: "sonaMuskaan420!",
+                user: process.env.NOTIFICATION_EMAIL,
+                pass: process.env.NOTIFICATION_PASS,
             },
         });
         const options = {
-            from: "auth_duty@outlook.com",
+            from: process.env.NOTIFICATION_EMAIL,
             to: emailTo,
             subject: "OTP - Verification",
-            html: `<h1>${OTP}</h1>`,
+            html: `<div style="background-color: #1a1a1a; color: #fff; font-family: 'Roboto', sans-serif; font-size: 16px; padding: 20px;">
+            <h2 style="font-size: 24px; margin-bottom: 20px;">Your OTP code is:</h2>
+            <p style="font-size: 32px; font-weight: bold; margin-bottom: 40px;">${OTP}</p>
+            <p style="margin-bottom: 0;">Please use this code to complete your verification process.</p>
+            <p style="margin-bottom: 0;">Note: This code is valid for one-time use only and will expire in 10 minutes.</p>
+          </div>`,
         };
 
         transporter.sendMail(options, async (err, result) => {
@@ -155,16 +161,28 @@ app.post('/otp', async (req, res) => {
             error.code = err.code;
             throw error
         }
-        return res.status(200).json({ data: null, code: 200, status: 'Success' })
+        return res.status(200).json({ data: {accessCode: generatedOtp}, code: 200, status: 'Success' })
     } catch (e) {
         return res.status(500).json({ data: e.message, code: e.code, status: 'failed' })
     }
 
 })
 
-app.get('/reset-password', async (req, res) => {
+app.post('/reset-password', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, accessCode } = req.body;
+
+        // const saveOtp = await Otp.findOne({ otp: accessCode }).catch(err => {
+        //     const error = new Error(err.message);
+        //     error.code = err.code;
+        //     throw error
+        // });
+        // if (!saveOtp) {
+        //     const error = new Error('Invalid OTP');
+        //     error.code = 404;
+        //     throw error
+        // }
+
         const updated = await User.updateOne({
             email: email
         }, { password: password }, { new: true }).catch(err => {
@@ -183,7 +201,12 @@ app.get('/reset-password', async (req, res) => {
         return res.status(500).json({ data: e.message, code: e.code, status: 'failed' })
     }
 })
+app.use((req, res) => {
+    res.send(404).json({ data: "404 not found", code: 404, status: 'Failed' })
+})
+// if(!process.env.NOTIFICATION_EMAIL || !process.env.NOTIFICATION_PASS || !process.env.PORT) {
 
-app.listen(port, () => {
-    console.log("Server listening on port http://localhost:" + port)
+// }
+app.listen(process.env.PORT, () => {
+    console.log("Server listening on port http://localhost:" + process.env.PORT)
 })
