@@ -1,10 +1,10 @@
 {
   "name": "back-end-water-park",
   "version": "1.0.0",
-  "main": "/app.js",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "start": "node index.js"
   },
   "repository": "https://github.com/M-Hassan-Malik/backend-water-park.git",
   "license": "MIT",
