@@ -29,6 +29,10 @@ const { User, Otp } = require('./databases/index');
 
 
 
+app.get('/',  (req, res) => {
+   res.send('ok')
+})
+
 app.post('/create-user', async (req, res) => {
     try {
         const { name, email, password } = req.body;
