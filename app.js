@@ -26,9 +26,6 @@ app.use(
 );
 const { User, Otp } = require('./databases/index');
 
-
-
-
 app.get('/',  (req, res) => {
    res.send('ok')
 })
