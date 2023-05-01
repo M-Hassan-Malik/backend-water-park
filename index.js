@@ -110,33 +110,56 @@ app.post('/forget-password', async (req, res) => {
           </div>`,
         };
 
-        transporter.sendMail(options, async (err, result) => {
-            if (err) {
-                return res.status(500).json({ data: `Something when wrong: ${err.message}`, code: 500, status: 'failed' });
-            } else {
 
-                const saveOtp = new Otp({
-                    otp: OTP,
-                    validity: moment().add(10, 'minutes').toDate()
-                })
+        const saveOtp = new Otp({
+            otp: OTP,
+            validity: moment().add(10, 'minutes').toDate()
+        })
 
-                await saveOtp.save()
-                    .catch(err => {
-                        const error = new Error(err.message);
-                        error.code = err.code;
-                        throw error
-                    });
+        await saveOtp.save()
+            .catch(err => {
+                const error = new Error(err.message);
+                error.code = err.code;
+                throw error
+            });
 
-                return res.status(200).json({
-                    data: {
-                        msg: `An verification OTP-code is sent to your email check/verify it please.`,
-                        otp: OTP,
-                    },
-                    status: "Success",
-                    code: 200,
-                });
-            }
+        return res.status(200).json({
+            data: {
+                msg: `An verification OTP-code is sent to your email check/verify it please.`,
+                otp: OTP,
+            },
+            status: "Success",
+            code: 200,
         });
+
+
+        // transporter.sendMail(options, async (err, result) => {
+        //     if (err) {
+        //         return res.status(500).json({ data: `Something when wrong: ${err.message}`, code: 500, status: 'failed' });
+        //     } else {
+
+        //         const saveOtp = new Otp({
+        //             otp: OTP,
+        //             validity: moment().add(10, 'minutes').toDate()
+        //         })
+
+        //         await saveOtp.save()
+        //             .catch(err => {
+        //                 const error = new Error(err.message);
+        //                 error.code = err.code;
+        //                 throw error
+        //             });
+
+        //         return res.status(200).json({
+        //             data: {
+        //                 msg: `An verification OTP-code is sent to your email check/verify it please.`,
+        //                 otp: OTP,
+        //             },
+        //             status: "Success",
+        //             code: 200,
+        //         });
+        //     }
+        // });
     } catch (e) {
         return res.status(500).json({ data: e.message, code: e.code, status: 'failed' })
     }
